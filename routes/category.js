@@ -38,7 +38,7 @@ router.get('/inProduct/:id', async(req, res)=>{
         where:{
             id:productId
         },
-        attributes:['categoryId','caegoryName']
+        attributes:['categoryId','categoryName']
     }))
     if(err)
     {
