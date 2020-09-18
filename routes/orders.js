@@ -1,15 +1,103 @@
 const express=require('express');
 const router=express.Router();
+const db=require('../database/db');
+const { validateToken } = require('../middlewares/auth');
+
 
 //Create orders
-router.post('/', (req, res)=>{
-    return res.json({data:'create orders', error:null})
+router.post('/',validateToken,async(req, res)=>{
+    let product_Id=req.body.productid;
+    let quantity=req.body.quantity;
+    let cart_id=req.body.cartname
+    let email=req.email;
+    if(typeof productId!='number' || typeof quantity!='number' || typeof cart_id!='string')
+    {
+        return res.json({data:null, error:'Invalid Entry'})
+    }
+    let [err, result]=await to (db.productModel.findAll({
+        where:{
+            id:product_Id
+        }
+    }))
+    if(err)
+    {
+        return res.json({data:null, error:err.message});
+    }
+    if(result.length==0)
+    {
+        return res.json({data:null, error:'No product exist with the given Id'});
+    }
+    [err, result]=await to(db.cartModel.findOrCreate({
+        where:{
+            productId:product_Id
+        },
+        defaults:{
+            id:0,
+            cartName:cart_id,
+            useremail:email,
+            productId:productId,
+            price:product_price,
+            quantity:quantity
+        }
+    }))
+    if(err)
+    {
+        return res.json({data:null, error:err.message})
+    }
+    if(!result[0]['_options'].isNewRecord)
+    {
+        return res.json({data:'product is alredy added in the cart', error:null})
+    } 
+    [err, result]=await to(db.orderModel.findOrCreate({
+        where:{
+            customerEmail:useremail,
+            cartName:cart_id
+        },
+        defaults:{
+            customerEmail:useremail,
+            cartName:cart_id
+        }
+    }))
+    if(err)
+    {
+        return res.json({data:null, error:err.message})
+    }
+    let order_id=result[0]['datavalues'].id
+    return res.json({data:`products added in the cart and your orderiD is ${order_id}`, error:null})
 })
 
 
 //Get details of an order
-router.get('/:id', (req,res)=>{
-    return res.json({data:'Get details of an order', error:null})
+router.get('/:id',validateToken ,async(req,res)=>{
+    let order_id=req.params.id;
+    let [err, result]=await to(db.orderModel.findAll({
+        where:{
+            id:order_id
+        }
+    }))
+    if(err)
+    {
+        return res.json({data:null, error:err.message})
+    }
+    if(result.length==0)
+    {
+        return res.json({data:null, error:'Invalid order Id'})
+    }
+    let cart_name=result[0]['dataValues'].cartName;
+    let user=req.email
+    [err, result]=await to(db.cartModel.findAll({
+        where:{
+            cartName:cart_name,
+            customerEmail:user
+        },
+        attributes:['productId','price','quantity']
+    }))
+    if(err)
+    {
+        return res.json({data:null, error:err.message})
+    }
+    let orderDetails=result[0]['datavalues']
+    return res.json({data:orderDetails, error:null})
 })
 
 //Get orders of Customer

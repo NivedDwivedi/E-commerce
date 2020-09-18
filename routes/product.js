@@ -1,35 +1,94 @@
 const express=require('express');
 const router=express.Router();
+const { default: to } = require('await-to-js');
+const db= require('../database/db')
 
 //Get all products
-router.get('/', (req,res)=>{
-    return res.json({data:'Get all products', error:null})
+router.get('/', async(req,res)=>{
+    let [err,result]=await to(db.productModel.findAll({
+        attributes:['name']
+    }))
+    if(err)
+    {
+        return res.json({data:null, error:err.message});
+    }
+    return res.json({data:result, error:null})
 })
 
-//Search products
-router.get('/search', (req,res)=>{
-    return res.json({data:'Search products', error:null})
-})
+
 
 //Get Product by ID
-router.get('/:id', (req, res)=>{
-    return res.json({data:'Get Product by ID', error:null})
+router.get('/:id', async(req, res)=>{
+    let productId=req.params.id
+    let [err,result]=await to(db.productModel.findAll({
+        where:{
+            id:productId
+        },
+        attributes:['name']
+    }))
+    if(err)
+    {
+        return res.json({data:null, error:err.message});
+    }
+    if(result.length==0)
+    {
+        return res.json({data:null, error:'No product with the given id'});
+    }
+    return res.json({data:result, error:null})
 })
 
 //Get list of product in categories
-router.get('/category/:id', (req,res)=>{
-    return res.json({data:'Get list of product in categories', error:null})
+router.get('/category/:id', async(req,res)=>{
+    let id=req.params.id
+    let [err,result]=await to(db.productLocationsModel.findAll({
+        where:{
+            categoryId:id
+        },
+        attributes:['productId', 'productName']
+    }))
+    if(err)
+    {
+        return res.json({data:null, error:err.message});
+    }
+    if(result.length==0)
+    {
+        return res.json({data:null, error:'No product are this category'});
+    }
+    return res.json({data:result, error:null})
 })
 
 //Get details of a product
-router.get('/:id/details', (req,res)=>{
-    return res.json({data:'Get details of a product', error:null})
+router.get('/:id/details', async(req,res)=>{
+    let productId=req.params.id
+    let [err,result]=await to(db.productModel.findAll({
+        where:{
+            id:productId
+        }
+    }))
+    if(err)
+    {
+        return res.json({data:null, error:err.message});
+    }
+    return res.json({data:result, error:null})
 })
 
 //Get reviews of a product
-router.get('/:id/review', (req, res)=>{
-    return res.json({data:'Get reviews of a product', error:null})
+router.get('/:id/review', async(req, res)=>{
+    let id=req.params.id
+    let [err,result]=await to(db.reviewModel.findAll({
+        where:{
+            productID:id
+        },
+        attributes:['name','review','rating']
+    }))
+    if(err)
+    {
+        return res.json({data:null, error:err.message});
+    }
+    return res.json({data:result, error:null})
 })
+
+
 
 
 

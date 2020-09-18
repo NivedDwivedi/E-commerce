@@ -63,6 +63,146 @@ const sequelize = new Sequelize('ecommerce', 'root', 'nived@99#', {
       }
   });
 
+
+  const categoryModel=sequelize.define('categoies',{
+    id:{
+      type:Sequelize.INTEGER.UNSIGNED,
+      autoIncrement:true,
+      allowNull:false,
+      primaryKey:true
+    },
+    name:{
+      type:Sequelize.STRING,
+      allowNull:false,
+    },
+    description:{
+      type:Sequelize.STRING,
+      allowNull:false,
+    }
+  })
+
+
+  const productModel=sequelize.define('products',{
+    id:{
+      type:Sequelize.INTEGER.UNSIGNED,
+      autoIncrement:true,
+      allowNull:false,
+      primaryKey:true
+    },
+    name:{
+      type:Sequelize.STRING,
+      allowNull:false,
+    },
+    description:{
+      type:Sequelize.STRING,
+      allowNull:false,
+    },
+    price:{
+      type:Sequelize.INTEGER.UNSIGNED,
+      allowNull:false
+    }
+  })
+
+
+  const productLocationsModel=sequelize.define('locations',{
+    id:{
+      type:Sequelize.INTEGER.UNSIGNED,
+      autoIncrement:true,
+      allowNull:false.INTEGER,
+      primaryKey:true
+    },
+    productId:{
+      type:Sequelize.INTEGER.UNSIGNED,
+      allowNull:false,
+    },
+    productName:{
+      type:Sequelize.STRING,
+      allowNull:true
+    },
+    categoryId:{
+      type:Sequelize.INTEGER,
+      allowNull:false,
+    },
+    categoryName:{
+      type:Sequelize.STRING,
+      allowNull:false
+    }
+  })
+
+
+  const reviewModel=sequelize.define('reviews',{
+    id:{
+      type:Sequelize.INTEGER.UNSIGNED,
+      allowNull:false,
+      primaryKey:true,
+      autoIncrement:true
+    },
+    productId:{
+      type:Sequelize.INTEGER.UNSIGNED,
+      allowNull:false,
+    },
+    name:{
+      type:Sequelize.STRING,
+      allowNull:false
+    },
+    review:{
+      type:Sequelize.STRING,
+      allowNull:true
+    },
+    rating:{
+      type:Sequelize.INTEGER,
+      allowNull:false
+    }
+  })
+
+
+  const cartModel=sequelize.define('carts',{
+    id:{
+      type:Sequelize.INTEGER.UNSIGNED,
+      autoIncrement:true,
+      allowNull:false,
+      unique:true
+    },
+    cartName:{
+      type:Sequelize.STRING,
+      allowNull:false
+    },
+    userEmail:{
+      type:Sequelize.STRING,
+      allowNull:false
+    },
+    productId:{
+      type:Sequelize.INTEGER.UNSIGNED,
+      primaryKey:true,
+      allowNull:false
+    },
+    price:{
+      type:Sequelize.INTEGER.UNSIGNED,
+      allowNull:false
+    },
+    quantity:{
+      type:Sequelize.INTEGER.UNSIGNED,
+      allowNull:false
+    }
+  })
+
+  const orderModel=sequelize.define('orders',{
+    id:{
+      type:Sequelize.INTEGER.UNSIGNED,
+      allowNull:false,
+      primaryKey:true,
+      autoIncrement:true
+    },
+    customerEmail:{
+      type:Sequelize.STRING,
+      allowNull:false
+    },
+    cartName:{
+      type:Sequelize.STRING,
+      allowNull:false
+    }
+  })
+
   const connectDB = async ()=>{
     let [err, result] = await to ( sequelize.sync( {alter:false} ) )
     if (err){
@@ -76,5 +216,11 @@ const sequelize = new Sequelize('ecommerce', 'root', 'nived@99#', {
 
 module.exports={
     connectDB,
-    customerModel
+    customerModel,
+    categoryModel,
+    productModel,
+    productLocationsModel,
+    reviewModel,
+    cartModel,
+    orderModel
   }

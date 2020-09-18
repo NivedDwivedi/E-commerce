@@ -1,10 +1,10 @@
 const { default: to } = require('await-to-js');
 const express=require('express');
 const router=express.Router();
-const db=require('../database/db')
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
-const {validateToken}=require('./auth')
+const db=require('../database/db')
+const {validateToken}=require('../middlewares/auth')
 
 
 //Password Encryption
@@ -21,6 +21,7 @@ const encrypt=async(password, req, res)=>{
 }
 
 
+//Token 
 let salt='ThisIsMySalt';
 const generatetoken=(userData)=>{
     let token= jwt.sign(userData, salt, { expiresIn:`60m`});
@@ -28,14 +29,42 @@ const generatetoken=(userData)=>{
 }
 
 //Update a customer
-router.put('/', validateToken, (req,res)=>{
-    return res.json({data:'update a customer', error:null});
+router.put('/', validateToken, async(req,res)=>{
+    let user_name=req.body.name;
+    let user_password=req.body.password;
+    let user_phone_num=req.body.phone;
+    if(typeof user_name!="string" || typeof user_password!="string" || typeof user_phone_num!="string")
+    {
+        return res.json({data:null, error:'Invalid Entry'})
+    }
+    let encryptedPassword=await encrypt(user_password);
+    let user_email=req.email;
+    let[err, data]=await to(db.customerModel.update({
+        name:user_name,
+        password:encryptedPassword,
+        phone_number:user_phone_num},{
+            where:{
+                email:user_email
+        }}))
+    if(err)
+    {
+        return res.json({data:null, error:err.message})
+    }
+    return res.json({data:'updated information sucessfully', error:null});
 })
 
 
 //Get a customer by id. The customer is fetched by token
 router.get('/', validateToken, async(req,res)=>{
     let user_email=req.body.email
+    if(typeof user_email!='string')
+    {
+        return res.json({data:null, error:'Invaid entry'});
+    }
+    if(user_email!=req.email)
+    {
+        return res.json({data:null, error:"you can not access others details"})
+    }
     let [err, data]=await to(db.customerModel.findAll({
         where:{
             email:user_email
@@ -52,13 +81,11 @@ router.get('/', validateToken, async(req,res)=>{
     return res.json({data:customer_data, error:null})
 })
 
+
+
+
+
 // //Registers a customer
-// router.post('/', (req,res)=>
-// {
-//     return res.json({data:'register a customer', error:null})
-// })
-
-
 router.post('/signup', async(req,res)=>{
     let user_id=0;
     let user_name=req.body.name;
@@ -143,6 +170,8 @@ router.post('/signup', async(req,res)=>{
 })
 
 
+
+
 //Sign in to the app
 router.post('/login', async(req,res)=>
 {
@@ -195,14 +224,49 @@ router.post('/login', async(req,res)=>
 
 
 //Update the address for the customer
-router.put('/address', (req, res)=>
+router.put('/address', validateToken, async(req, res)=>
 {
-    return res.json({data:'update the customer address', error:null});
+    let user_address=req.body.address;
+    if(typeof user_address!='string')
+    {
+        return res.json({data:null, error:'Invalid address format'});
+    }
+    let user_email=req.email;
+    let[err, data]=await to (db.customerModel.update({address:user_address},{
+        where:{
+            email:user_email
+        }
+        
+    }))
+    if(err)
+    {
+        return res.json({data:null, error:err.message})
+    }
+    return res.json({data:'address updated sucessfully', error:null});
 })
 
+
+
+
 //Updates the credit card of a customer
-router.put('/creditCard', (req,res)=>{
-    return res.json({data:'update the credit card of a customer', error:null});
+router.put('/creditCard', validateToken,async(req,res)=>{
+    let user_card=req.body.card;
+    if(typeof user_card!='string')
+    {
+        return res.json({data:null, error:'Invalid address format'});
+    }
+    let user_email=req.email;
+    let[err, data]=await to (db.customerModel.update({credit_card:user_card},{
+        where:{
+            email:user_email
+        }
+        
+    }))
+    if(err)
+    {
+        return res.json({data:null, error:err.message})
+    }
+    return res.json({data:'credit card updated sucessfully', error:null});
 })
 
 
