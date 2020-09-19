@@ -15,8 +15,6 @@ router.get('/', async(req,res)=>{
     return res.json({data:result, error:null})
 })
 
-
-
 //Get Product by ID
 router.get('/:id', async(req, res)=>{
     let productId=req.params.id

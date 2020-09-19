@@ -29,6 +29,7 @@ const validateToken=async(req, res, next) => {
     {
         return res.json({data:null, error:"Something went wrong"});
     }
+    
     // let userId=userdata.id;
     let userEmail=userdata.email
     let [errs, data]=await to (db.customerModel.findAll({where:{
@@ -45,6 +46,7 @@ const validateToken=async(req, res, next) => {
         }
         else{
             req.email=userdata.email;
+            // console.log(req.email);
             next();
         }
     }

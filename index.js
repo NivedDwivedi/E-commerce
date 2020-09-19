@@ -9,6 +9,7 @@ const customer=require('./routes/customer');
 const categories=require('./routes/category');
 const products=require('./routes/product');
 const orders=require('./routes/orders');
+const adminR=require('./routes/admin');
 const database=require('./database/db');
 
 
@@ -27,7 +28,7 @@ database.connectDB();
 
 
 
-
+app.use('/admin', adminR);
 app.use('/customer/', customer);
 app.use('/categories/', categories);
 app.use('/products/', products);

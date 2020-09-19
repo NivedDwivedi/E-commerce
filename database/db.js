@@ -7,6 +7,8 @@ const sequelize = new Sequelize('ecommerce', 'root', 'nived@99#', {
     dialect: 'mysql'
   });
 
+
+  //Customer Table
   const customerModel= sequelize.define('customers',{
       id:{
           type:Sequelize.INTEGER.UNSIGNED,
@@ -63,8 +65,8 @@ const sequelize = new Sequelize('ecommerce', 'root', 'nived@99#', {
       }
   });
 
-
-  const categoryModel=sequelize.define('categoies',{
+  //Category Table
+  const categoryModel=sequelize.define('categories',{
     id:{
       type:Sequelize.INTEGER.UNSIGNED,
       autoIncrement:true,
@@ -81,7 +83,7 @@ const sequelize = new Sequelize('ecommerce', 'root', 'nived@99#', {
     }
   })
 
-
+  //product Table
   const productModel=sequelize.define('products',{
     id:{
       type:Sequelize.INTEGER.UNSIGNED,
@@ -103,7 +105,7 @@ const sequelize = new Sequelize('ecommerce', 'root', 'nived@99#', {
     }
   })
 
-
+  //ProducT Category Table
   const productLocationsModel=sequelize.define('locations',{
     id:{
       type:Sequelize.INTEGER.UNSIGNED,
@@ -129,7 +131,7 @@ const sequelize = new Sequelize('ecommerce', 'root', 'nived@99#', {
     }
   })
 
-
+  //Review Table 
   const reviewModel=sequelize.define('reviews',{
     id:{
       type:Sequelize.INTEGER.UNSIGNED,
@@ -155,7 +157,7 @@ const sequelize = new Sequelize('ecommerce', 'root', 'nived@99#', {
     }
   })
 
-
+  //Cart Table
   const cartModel=sequelize.define('carts',{
     id:{
       type:Sequelize.INTEGER.UNSIGNED,
@@ -186,6 +188,7 @@ const sequelize = new Sequelize('ecommerce', 'root', 'nived@99#', {
     }
   })
 
+  //OrderTable
   const orderModel=sequelize.define('orders',{
     id:{
       type:Sequelize.INTEGER.UNSIGNED,
@@ -203,6 +206,8 @@ const sequelize = new Sequelize('ecommerce', 'root', 'nived@99#', {
     }
   })
 
+
+  //Database Connection
   const connectDB = async ()=>{
     let [err, result] = await to ( sequelize.sync( {alter:false} ) )
     if (err){
@@ -213,7 +218,7 @@ const sequelize = new Sequelize('ecommerce', 'root', 'nived@99#', {
     console.log({data:`Successfully connected to Database`, error:null});
 }
 
-
+//Modules
 module.exports={
     connectDB,
     customerModel,

@@ -38,7 +38,7 @@ router.get('/inProduct/:id', async(req, res)=>{
         where:{
             id:productId
         },
-        attributes:['categoryId','categoryName']
+        attributes:['categoryId','caegoryName']
     }))
     if(err)
     {
@@ -47,8 +47,6 @@ router.get('/inProduct/:id', async(req, res)=>{
     return res.json({data:result, error:null})
     
 })
-
-
 
 
 module.exports=router;

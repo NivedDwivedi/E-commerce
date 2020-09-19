@@ -162,8 +162,8 @@ router.post('/signup', async(req,res)=>{
         {
             return res.json({data:'Already have an account please login', error:null})
         }
-
-        return res.json({data:'success', error:null})
+    let userID=result[0]['dataValues'].id;
+        return res.json({data:`success!, Your UserId is: ${userID}`, error:null})
     }
     
     
@@ -177,7 +177,10 @@ router.post('/login', async(req,res)=>
 {
     let user_email=req.body.email;
     let user_password=req.body.password;
-
+    if(typeof user_email!="string" || typeof user_password!='string')
+    {
+        return res.json({data:null, error:'Invalid Entry'})
+    }
     let[err, data]=await to(db.customerModel.findAll({
         where:{
             email:user_email

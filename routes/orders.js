@@ -1,5 +1,6 @@
 const express=require('express');
 const router=express.Router();
+const { default: to } = require('await-to-js');
 const db=require('../database/db');
 const { validateToken } = require('../middlewares/auth');
 
@@ -10,11 +11,12 @@ router.post('/',validateToken,async(req, res)=>{
     let quantity=req.body.quantity;
     let cart_id=req.body.cartname
     let email=req.email;
-    if(typeof productId!='number' || typeof quantity!='number' || typeof cart_id!='string')
+    // console.log(req.email);
+    if(typeof product_Id!='number' || typeof quantity!='number' || typeof cart_id!='string')
     {
         return res.json({data:null, error:'Invalid Entry'})
     }
-    let [err, result]=await to (db.productModel.findAll({
+    let [err, result]=await to(db.productModel.findAll({
         where:{
             id:product_Id
         }
@@ -27,6 +29,7 @@ router.post('/',validateToken,async(req, res)=>{
     {
         return res.json({data:null, error:'No product exist with the given Id'});
     }
+    let product_price=result[0]['dataValues'].price;
     [err, result]=await to(db.cartModel.findOrCreate({
         where:{
             productId:product_Id
@@ -34,8 +37,8 @@ router.post('/',validateToken,async(req, res)=>{
         defaults:{
             id:0,
             cartName:cart_id,
-            useremail:email,
-            productId:productId,
+            userEmail:email,
+            productId:product_Id,
             price:product_price,
             quantity:quantity
         }
@@ -50,11 +53,11 @@ router.post('/',validateToken,async(req, res)=>{
     } 
     [err, result]=await to(db.orderModel.findOrCreate({
         where:{
-            customerEmail:useremail,
+            customerEmail:email,
             cartName:cart_id
         },
         defaults:{
-            customerEmail:useremail,
+            customerEmail:email,
             cartName:cart_id
         }
     }))
@@ -62,13 +65,53 @@ router.post('/',validateToken,async(req, res)=>{
     {
         return res.json({data:null, error:err.message})
     }
-    let order_id=result[0]['datavalues'].id
-    return res.json({data:`products added in the cart and your orderiD is ${order_id}`, error:null})
+    let order_id=result[0]['dataValues'].id
+    return res.json({data:`Products added in the cart and your orderId is ${order_id}`, error:null})
 })
 
 
 //Get details of an order
 router.get('/:id',validateToken ,async(req,res)=>{
+    let order_id=req.params.id;
+    let user=req.email
+    let [err, result]=await to(db.orderModel.findAll({
+        where:{
+            id:order_id
+        }
+    }))
+    if(err)
+    {
+        return res.json({data:null, error:err.message})
+    }
+    if(result.length==0)
+    {
+        return res.json({data:null, error:'Invalid order Id'})
+    }
+    let cart_name=result[0]['dataValues'].cartName;
+    
+    [err, result]=await to(db.cartModel.findAll({
+        where:{
+            cartName:cart_name,
+            userEmail:user
+        },
+        attributes:['productId','price','quantity']
+    }))
+    if(err)
+    {
+        return res.json({data:null, error:err.message})
+    }
+    // console.log(result);
+    let orderDetails=result[0]['dataValues']
+    return res.json({data:orderDetails, error:null})
+})
+
+//Get orders of Customer
+router.get('/inCustomer', validateToken,async(req,res)=>{
+    return res.json({data:'Get orders of Customer', error:null})
+})
+
+//Get info about order
+router.get('/shortDetails/:id', validateToken, async(req, res)=>{
     let order_id=req.params.id;
     let [err, result]=await to(db.orderModel.findAll({
         where:{
@@ -90,7 +133,7 @@ router.get('/:id',validateToken ,async(req,res)=>{
             cartName:cart_name,
             customerEmail:user
         },
-        attributes:['productId','price','quantity']
+        attributes:['productId']
     }))
     if(err)
     {
@@ -98,16 +141,6 @@ router.get('/:id',validateToken ,async(req,res)=>{
     }
     let orderDetails=result[0]['datavalues']
     return res.json({data:orderDetails, error:null})
-})
-
-//Get orders of Customer
-router.get('/inCustomer', (req,res)=>{
-    return res.json({data:'Get orders of Customer', error:null})
-})
-
-//Get info about order
-router.get('/shortDetails/:id', (req, res)=>{
-    return res.json({data:'Get info about order', error:null})
 })
 
 
