@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { default: to } = require('await-to-js');
-const db = require('../database/db')
+const db = require('../lib/database/db')
 
 //Get categories
 router.get('/', async(req,res)=>{
@@ -28,21 +28,29 @@ router.get('/:id', async(req,res)=>{
     {
         return res.json({data:null, error:err.message});
     }
+    if(result.length==0)
+    {
+        return res.json({data:null, error:`No category exist with the given Id:${categoryId}`})
+    }
     return res.json({data:result, error:null})
 })
 
-//Get Categories of a Product
+//Get Category of a Product by product id
 router.get('/inProduct/:id', async(req, res)=>{
     let productId=req.params.id;
     let [err,result]=await to(db.productLocationsModel.findAll({
         where:{
             id:productId
         },
-        attributes:['categoryId','caegoryName']
+        attributes:['categoryId','categoryName']
     }))
     if(err)
     {
         return res.json({data:null, error:err.message});
+    }
+    if(result.length==0)
+    {
+        return res.json({data:null, error:`No data found on productId:${productId}`})
     }
     return res.json({data:result, error:null})
     

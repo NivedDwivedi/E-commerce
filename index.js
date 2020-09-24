@@ -10,7 +10,7 @@ const categories=require('./routes/category');
 const products=require('./routes/product');
 const orders=require('./routes/orders');
 const adminR=require('./routes/admin');
-const database=require('./database/db');
+const database=require('./lib/database/db');
 
 
 
@@ -34,5 +34,5 @@ app.use('/categories/', categories);
 app.use('/products/', products);
 app.use('/orders/', orders);
 
-const port=process.env.port || 3000;
+const port=3000;
 app.listen(3000, (req, res)=>console.log(`we are at port ${port}`));

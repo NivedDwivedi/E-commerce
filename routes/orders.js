@@ -1,24 +1,30 @@
 const express=require('express');
 const router=express.Router();
 const { default: to } = require('await-to-js');
-const db=require('../database/db');
+const db=require('../lib/database/db');
+const utils = require('../data/utils')
+const constant= require('../lib/constant');
 const { validateToken } = require('../middlewares/auth');
+
 
 
 //Create orders
 router.post('/',validateToken,async(req, res)=>{
-    let product_Id=req.body.productid;
-    let quantity=req.body.quantity;
-    let cart_id=req.body.cartname
+    
     let email=req.email;
     // console.log(req.email);
-    if(typeof product_Id!='number' || typeof quantity!='number' || typeof cart_id!='string')
+    
+    let payloadData=req.body
+    let validations=await utils.validateCreateOrder.validate(payloadData);
+
+    if(validations && validations.error)
     {
-        return res.json({data:null, error:'Invalid Entry'})
+        return res.json({data:null, error:validations['error'].message})
     }
+
     let [err, result]=await to(db.productModel.findAll({
         where:{
-            id:product_Id
+            id:payloadData.productId
         }
     }))
     if(err)
@@ -32,15 +38,15 @@ router.post('/',validateToken,async(req, res)=>{
     let product_price=result[0]['dataValues'].price;
     [err, result]=await to(db.cartModel.findOrCreate({
         where:{
-            productId:product_Id
+            productId:payloadData.productId
         },
         defaults:{
-            id:0,
-            cartName:cart_id,
+            id:constant.ID_INITIALIZATION,
+            cartName:payloadData.cartname,
             userEmail:email,
-            productId:product_Id,
+            productId:payloadData.productId,
             price:product_price,
-            quantity:quantity
+            quantity:payloadData.quantity
         }
     }))
     if(err)
@@ -49,16 +55,16 @@ router.post('/',validateToken,async(req, res)=>{
     }
     if(!result[0]['_options'].isNewRecord)
     {
-        return res.json({data:'product is alredy added in the cart', error:null})
+        return res.json({data:'Product is alredy added in the cart!', error:null})
     } 
     [err, result]=await to(db.orderModel.findOrCreate({
         where:{
             customerEmail:email,
-            cartName:cart_id
+            cartName:payloadData.cartname
         },
         defaults:{
             customerEmail:email,
-            cartName:cart_id
+            cartName:payloadData.cartname
         }
     }))
     if(err)
@@ -113,6 +119,7 @@ router.get('/inCustomer', validateToken,async(req,res)=>{
 //Get info about order
 router.get('/shortDetails/:id', validateToken, async(req, res)=>{
     let order_id=req.params.id;
+    let user=req.email;
     let [err, result]=await to(db.orderModel.findAll({
         where:{
             id:order_id
@@ -127,11 +134,11 @@ router.get('/shortDetails/:id', validateToken, async(req, res)=>{
         return res.json({data:null, error:'Invalid order Id'})
     }
     let cart_name=result[0]['dataValues'].cartName;
-    let user=req.email
+    
     [err, result]=await to(db.cartModel.findAll({
         where:{
             cartName:cart_name,
-            customerEmail:user
+            userEmail:user
         },
         attributes:['productId']
     }))

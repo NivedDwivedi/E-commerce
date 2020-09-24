@@ -1,27 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const { default: to } = require('await-to-js');
-const db = require('../database/db')
+const db = require('../lib/database/db');
+const utils=require('../data/utils');
+const constant= require('../lib/constant');
 
 
 //category
 router.post('/category',async(req, res)=>{
-    let categoryName=req.body.name;
-    let categoryDescription=req.body.description;
-    
-    if(typeof categoryName!='string' || typeof categoryDescription!='string'  )
+    let payloadData=req.body
+    let validations=await utils.validateCategory.validate(payloadData);
+
+    if(validations && validations.error)
     {
-        return res.json({data:null, error:'Invalid Entry'});
+        return res.json({data:null, error:validations['error'].message})
     }
-    let Name= categoryName.toUpperCase();
+    let Name= payloadData.name.toUpperCase();
     let [err, result]=await to(db.categoryModel.findOrCreate({
         where:{
             name:Name
         },
         defaults:{
-            id:0,
-            name:categoryName,
-            description:categoryDescription
+            id:constant.ID_INITIALIZATION,
+            name:payloadData.name,
+            description:payloadData.description
         }
     }))
     if(err)
@@ -30,7 +32,7 @@ router.post('/category',async(req, res)=>{
     }
     if(!result[0]['_options'].isNewRecord)
     {
-        return res.json({data:null, error:'this category is already present'})
+        return res.json({data:null, error:'This category is already present'})
     }
 
     return res.json({data:'Category added successfully', error:null})
@@ -39,22 +41,22 @@ router.post('/category',async(req, res)=>{
 
 //product
 router.post('/product',async(req, res)=>{
-    let productName=req.body.name;
-    let productDescription=req.body.description;
-    let productPrice=req.body.price;
-    let productCategory=req.body.category;
-    
-    if(typeof productName!='string' || typeof productDescription!='string' || typeof productPrice!='number' || typeof productCategory!='string' )
+    let payloadData=req.body
+    let validations=await utils.validatePoduct.validate(payloadData);
+
+    if(validations && validations.error)
     {
-        return res.json({data:null, error:'Invalid Entry'});
+        return res.json({data:null, error:validations['error'].message})
     }
-    let Name= productName.toUpperCase();
-    
+
+
+    let Name= payloadData.name.toUpperCase();
+    let category=payloadData.category.toUpperCase();
 
     //validate category
     let [err, result]=await to(db.categoryModel.findAll({
         where:{
-            name:productCategory
+            name:category
         }
     }))
     if(err)
@@ -73,10 +75,10 @@ router.post('/product',async(req, res)=>{
             name:Name
         },
         defaults:{
-            id:0,
+            id:constant.ID_INITIALIZATION,
             name:Name,
-            description:productDescription,
-            price:productPrice
+            description:payloadData.description,
+            price:payloadData.price
         }
     }))
     if(err)
@@ -92,11 +94,11 @@ router.post('/product',async(req, res)=>{
     //update location table
     [err, result]=await to(db.productLocationsModel.create({
         
-        id:0,
+        id:constant.ID_INITIALIZATION,
         productId:pid,
-        productName:productName,
+        productName:Name,
         categoryId:category_id,
-        categoryName:productCategory
+        categoryName:payloadData.category
     }))
     if(err)
     {
@@ -109,10 +111,6 @@ router.post('/product',async(req, res)=>{
     // }
     return res.json({data:'Product added successfully', error:null})
 })
-
-
-
-
 
 
 

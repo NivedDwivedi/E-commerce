@@ -1,7 +1,7 @@
 const express=require('express');
 const router=express.Router();
 const { default: to } = require('await-to-js');
-const db= require('../database/db')
+const db= require('../lib/database/db')
 
 //Get all products
 router.get('/', async(req,res)=>{
@@ -22,7 +22,7 @@ router.get('/:id', async(req, res)=>{
         where:{
             id:productId
         },
-        attributes:['name']
+        attributes:['name' ,'description']
     }))
     if(err)
     {
