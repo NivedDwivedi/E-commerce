@@ -6,7 +6,11 @@ const jwt=require('jsonwebtoken');
 const db=require('../lib/database/db');
 const constant=require('../lib/constant');
 const utils = require('../data/utils');
+const logger= require('../lib/logging/winston')
 const {validateToken}=require('../middlewares/auth');
+
+
+
 
 
 //Password Encryption
@@ -17,7 +21,7 @@ const encrypt=async(password)=>{
     {
         // return res.json({data:'null', error:'something went wrong'});
         // return res.send("Encryption failed!");
-        console.log(err);
+        logger.error(err);
     }
     return encrypt;
 }
@@ -51,7 +55,9 @@ router.put('/', validateToken, async(req,res)=>{
         }}))
     if(err)
     {
-        return res.json({data:null, error:err.message})
+        logger.error(err);
+        return res.json({data:null, error:err.message});
+        
     }
     return res.json({data:'Updated Information Sucessfully', error:null});
 })
@@ -79,6 +85,7 @@ router.get('/', validateToken, async(req,res)=>{
         }}))
     if(err)
     {
+        logger.error(err);
         return res.json({data:'null', error:err.message});
     }
     if(data.length==0)
@@ -126,6 +133,7 @@ router.post('/signup', async(req,res)=>{
     // console.log(result.length);
     if(err)
     {
+        logger.error(err);
         return res.json({data:'null', error:err.message});
     }
     
@@ -147,8 +155,6 @@ router.post('/signup', async(req,res)=>{
 //Sign in to the app
 router.post('/login', async(req,res)=>
 {
-   
-
     let payloadData=req.body;
     let validation = await utils.validateLogin.validate(payloadData);
 
@@ -164,6 +170,7 @@ router.post('/login', async(req,res)=>
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message});
     }
     
@@ -188,6 +195,7 @@ router.post('/login', async(req,res)=>
         );
         if(errs)
         {
+            logger.error(errs);
             return res.json({data:null, error:errs.message})
         }
         if(isValid)
@@ -206,8 +214,6 @@ router.post('/login', async(req,res)=>
 //Update the address for the customer
 router.put('/address', validateToken, async(req, res)=>
 {
-    
-
     let payloadData=req.body;
     let validation = await utils.validateAddress.validate(payloadData);
 
@@ -225,11 +231,11 @@ router.put('/address', validateToken, async(req, res)=>
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message})
     }
     return res.json({data:'Address Updated Sucessfully', error:null});
 })
-
 
 
 
@@ -251,6 +257,7 @@ router.put('/creditCard', validateToken,async(req,res)=>{
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message})
     }
     return res.json({data:'Credit Card Details Updated Sucessfully', error:null});

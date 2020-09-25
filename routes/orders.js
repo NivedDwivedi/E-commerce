@@ -5,6 +5,7 @@ const db=require('../lib/database/db');
 const utils = require('../data/utils')
 const constant= require('../lib/constant');
 const { validateToken } = require('../middlewares/auth');
+const logger= require('../lib/logging/winston')
 
 
 
@@ -12,8 +13,6 @@ const { validateToken } = require('../middlewares/auth');
 router.post('/',validateToken,async(req, res)=>{
     
     let email=req.email;
-    // console.log(req.email);
-    
     let payloadData=req.body
     let validations=await utils.validateCreateOrder.validate(payloadData);
 
@@ -29,6 +28,7 @@ router.post('/',validateToken,async(req, res)=>{
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message});
     }
     if(result.length==0)
@@ -51,6 +51,7 @@ router.post('/',validateToken,async(req, res)=>{
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message})
     }
     if(!result[0]['_options'].isNewRecord)
@@ -69,6 +70,7 @@ router.post('/',validateToken,async(req, res)=>{
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message})
     }
     let order_id=result[0]['dataValues'].id
@@ -87,6 +89,7 @@ router.get('/:id',validateToken ,async(req,res)=>{
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message})
     }
     if(result.length==0)
@@ -104,6 +107,7 @@ router.get('/:id',validateToken ,async(req,res)=>{
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message})
     }
     // console.log(result);
@@ -127,6 +131,7 @@ router.get('/shortDetails/:id', validateToken, async(req, res)=>{
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message})
     }
     if(result.length==0)
@@ -144,6 +149,7 @@ router.get('/shortDetails/:id', validateToken, async(req, res)=>{
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message})
     }
     let orderDetails=result[0]['datavalues']

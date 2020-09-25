@@ -2,6 +2,7 @@ const express=require('express');
 const router=express.Router();
 const { default: to } = require('await-to-js');
 const db= require('../lib/database/db')
+const logger= require('../lib/logging/winston')
 
 //Get all products
 router.get('/', async(req,res)=>{
@@ -10,6 +11,7 @@ router.get('/', async(req,res)=>{
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message});
     }
     return res.json({data:result, error:null})
@@ -26,6 +28,7 @@ router.get('/:id', async(req, res)=>{
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message});
     }
     if(result.length==0)
@@ -46,6 +49,7 @@ router.get('/category/:id', async(req,res)=>{
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message});
     }
     if(result.length==0)
@@ -65,6 +69,7 @@ router.get('/:id/details', async(req,res)=>{
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message});
     }
     return res.json({data:result, error:null})
@@ -81,6 +86,7 @@ router.get('/:id/review', async(req, res)=>{
     }))
     if(err)
     {
+        logger.error(err);
         return res.json({data:null, error:err.message});
     }
     return res.json({data:result, error:null})
