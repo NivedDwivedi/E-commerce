@@ -5,7 +5,8 @@ const db=require('../lib/database/db');
 const utils = require('../data/utils')
 const constant= require('../lib/constant');
 const { validateToken } = require('../middlewares/auth');
-const logger= require('../lib/logging/winston')
+const logger= require('../lib/logging/winston');
+const Joi = require('joi');
 
 
 
@@ -56,7 +57,7 @@ router.post('/',validateToken,async(req, res)=>{
     }
     if(!result[0]['_options'].isNewRecord)
     {
-        return res.json({data:'Product is alredy added in the cart!', error:null})
+        return res.json({data:null, error:'Product is alredy added in the cart!'})
     } 
     [err, result]=await to(db.orderModel.findOrCreate({
         where:{
@@ -157,5 +158,56 @@ router.get('/shortDetails/:id', validateToken, async(req, res)=>{
 })
 
 
+//Post Review 
+router.post('/review', validateToken, (req, res)=>{
+    let useremail=req.email;
+    let payloadData=req.body;
+
+    let validations= await utils.validateReview.validate(payloadData);
+    if(validations && validations.error)
+    {
+        return res.json({data:null, error:validations['error'].message})
+    }
+
+    let [err, result]=await to(db.cartModel.findAll({
+        where:{
+            userEmail:useremail,
+            productId:payloadData.productid
+        }
+    }))
+    if(err)
+    {
+        logger.log(err);
+        return res.json({data:null, error:err.message})
+    }
+    if(result.length==0)
+    {
+        return res.json({data:null, error:'You can not post a review for this product'})
+    }
+    let username;
+    let [err, result]=await to(db.reviewModel.findOrCreate({
+        where:{
+            userEmail:useremail,
+            productId:payloadData.productid
+        },
+        defaults:{
+            id:constant.ID_INITIALIZATION,
+            productId:payloadData.productid,
+            email:useremail,
+            review:payloadData.review,
+            rating:payloadData.rating
+        }
+    }))
+    if(err)
+    {
+        logger.log(err);
+        return res.json({data:null, error:err.message})
+    }
+    if(!result[0]['_options'].isNewRecord)
+    {
+        return res.json({data:null, error:'Already posted a review for this product'});
+    } 
+
+})
 
 module.exports=router;
