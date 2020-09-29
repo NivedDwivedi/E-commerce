@@ -2,7 +2,7 @@ const express=require('express');
 const router=express.Router();
 const { default: to } = require('await-to-js');
 const db= require('../lib/database/db')
-const logger= require('../lib/logging/winston')
+const logger= require('../lib/log/winston')
 
 //Get all products
 router.get('/', async(req,res)=>{

@@ -37,20 +37,36 @@ const validateEmail = Joi.object().keys({
 
 
 const validateUpdation = Joi.object().keys({
-    
     city:Joi.string().required(),
     country:Joi.string().required(),
     phone:Joi.number().integer().min(7000000000).max(9999999999).required(),
 })
 
 
-const validateCreateOrder = Joi.object().keys({
+const validateCartItem = Joi.object().keys({
     productId:Joi.number().integer().positive().required(),
-    quantity:Joi.number().integer().positive().required(),
-    cartname:Joi.string().required(),
+    quantity:Joi.number().integer().positive().min(1).required(),
 
 })
 
+const validateCartbuyItem = Joi.object().keys({
+    status:Joi.number().integer().min(0).max(1).required()
+})
+
+const validateDirectbuyItem = Joi.object().keys({
+    productId:Joi.number().integer().positive().required(),
+    quantity:Joi.number().integer().positive().min(1).required(),
+
+})
+
+const validateReview= Joi.object().keys({
+    productid:Joi.number().integer().positive().required(),
+    review:Joi.string().required(),
+    rating:Joi.number().integer().positive().min(1).max(5).required()
+})
+
+
+// admin payload validation start
 const validatePoduct= Joi.object().keys({
     name:Joi.string().required(),
     description:Joi.string().required(),
@@ -58,10 +74,14 @@ const validatePoduct= Joi.object().keys({
     category:Joi.string().required()
 })
 
+
 const validateCategory= Joi.object().keys({
     name:Joi.string().required(),
     description:Joi.string().required()
 })
+// admin payload validation end
+
+
 
 
 module.exports={
@@ -71,7 +91,10 @@ module.exports={
     validateCard,
     validateEmail,
     validateUpdation,
-    validateCreateOrder,
+    validateCartItem,
     validatePoduct,
-    validateCategory
+    validateCategory,
+    validateReview,
+    validateCartbuyItem,
+    validateDirectbuyItem
 }

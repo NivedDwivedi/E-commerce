@@ -11,8 +11,8 @@ const products=require('./routes/product');
 const orders=require('./routes/orders');
 const adminR=require('./admin/admin');
 const database=require('./lib/database/db');
-const logger = require('./lib/logging/winston');
-const sentry = require('./lib/alerting/sentry');
+const logger = require('./lib/log/winston');
+// const sentry = require('./lib/alert/sentry');
 
 
 
@@ -28,13 +28,13 @@ database.connectDB();
 
 
 
-
+// app.use(sentry);
 app.use('/admin', adminR);
 app.use('/customer/', customer);
 app.use('/categories/', categories);
 app.use('/products/', products);
 app.use('/orders/', orders);
-// app.use(sentry);
+
 
 const port=3000;
 app.listen(3000, (req, res)=>logger.info(`we are at port ${port}`));

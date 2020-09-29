@@ -4,14 +4,14 @@ const router=express.Router();
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
 const db=require('../lib/database/db');
-const constant=require('../lib/constant');
+const constant= require('../lib/constant');
 const utils = require('../data/utils');
-const logger= require('../lib/logging/winston')
+const logger= require('../lib/log/winston')
 const {validateToken}=require('../middlewares/auth');
 
 
 
-
+// console.log(a); 
 
 //Password Encryption
 const encrypt=async(password)=>{
@@ -133,7 +133,7 @@ router.post('/signup', async(req,res)=>{
     // console.log(result.length);
     if(err)
     {
-        logger.error(err);
+        // logger.error(err);
         return res.json({data:'null', error:err.message});
     }
     
