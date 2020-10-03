@@ -1,13 +1,13 @@
 const jwt=require('jsonwebtoken');
 const { default: to } = require('await-to-js');
 const db=require('../lib/database/db');
-const constant=require('../lib/constant')
 
 
 
 
 
-let salt=constant.MY_SALT;
+
+let salt=process.env.MY_SALT;
 
 const validateToken=async(req, res, next) => {
     let userdata;

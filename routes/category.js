@@ -1,63 +1,28 @@
 const express = require('express');
 const router = express.Router();
-const { default: to } = require('await-to-js');
-const db = require('../lib/database/db')
-const logger= require('../lib/log/winston')
+const { getCategoryService, 
+    getCategorybyIdService, 
+    getCategorybyproductService} = require('../services/categoryservices');
 
 //Get categories
 router.get('/', async(req,res)=>{
-    let [err,result]=await to(db.categoryModel.findAll({
-        attributes:['name']
-    }))
-    if(err)
-    {
-        logger.error(err);
-        return res.json({data:null, error:err.message});
-    }
-    return res.json({data:result, error:null})
+    let resultData= await getCategoryService()
+    return res.json({data:resultData.data, error:resultData.error})
 })
 
 //Get category by ID
 router.get('/:id', async(req,res)=>{
     let categoryId=req.params.id;
-    let [err,result]=await to(db.categoryModel.findAll({
-        where:{
-            id:categoryId
-        },
-        attributes:['name', 'description']
-    }))
-    if(err)
-    {
-        logger.error(err);
-        return res.json({data:null, error:err.message});
-    }
-    if(result.length==0)
-    {
-        return res.json({data:null, error:`No category exist with the given Id:${categoryId}`})
-    }
-    return res.json({data:result, error:null})
+    let resultData= await getCategorybyIdService(categoryId)
+    return res.json({data:resultData.data, error:resultData.error})
 })
 
 //Get Category of a Product by product id
 router.get('/inProduct/:id', async(req, res)=>{
     let productId=req.params.id;
-    let [err,result]=await to(db.productLocationsModel.findAll({
-        where:{
-            id:productId
-        },
-        attributes:['categoryId','categoryName']
-    }))
-    if(err)
-    {
-        logger.error(err);
-        return res.json({data:null, error:err.message});
-    }
-    if(result.length==0)
-    {
-        return res.json({data:null, error:`No data found on productId:${productId}`})
-    }
-    return res.json({data:result, error:null})
     
+    let resultData= await getCategorybyproductService(productId)
+    return res.json({data:resultData.data, error:resultData.error})
 })
 
 
