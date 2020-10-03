@@ -1,10 +1,10 @@
 # E-commerce
 
-##Description
+## Description
 This repository contains code e-commerce APIs in NodeJS, used mysql database impleneted it using Squelize ORM and used JWT for authentication also added Winston and JOI for logging and validations.
 
 
-##Instructions for setup
+## Instructions for setup
 
 -Install node you system
 -Clone this repo on your system
@@ -17,6 +17,6 @@ This repository contains code e-commerce APIs in NodeJS, used mysql database imp
 
 
 
-##Postman Collection
+## Postman Collection
 [click here](https://www.getpostman.com/collections/50c36b471f0c3c3319bc) for postman collection link
 
