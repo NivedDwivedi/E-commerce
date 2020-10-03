@@ -20,3 +20,7 @@ This repository contains code e-commerce APIs in NodeJS, used mysql database imp
 ## Postman Collection
 [click here](https://www.getpostman.com/collections/50c36b471f0c3c3319bc) for postman collection link
 
+
+## Video link
+[Click here ](https://youtu.be/vhjguukFtdU) to watch the video
+
