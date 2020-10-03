@@ -9,8 +9,8 @@ This repository contains code e-commerce APIs in NodeJS, used mysql database imp
 - Install node you system
 - Clone this repo on your system
 - Open terminal inside the cloned floder
-- Install all the dependecies, ```bash use npm ``` to install dependecies
-- Create your database named ```bash ecommerce```  change the 
+- Install all the dependecies, use ```npm install``` to install dependecies
+- Create your database named ```ecommerce```  run the server it will automatically create all the tables
 - Install the postman collection from the link given below
 - Start using APIs
 
